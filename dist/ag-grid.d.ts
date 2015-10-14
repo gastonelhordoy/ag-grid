@@ -213,7 +213,7 @@ declare module ag.grid {
         getIsScrollLag(): () => boolean;
         getSortingOrder(): string[];
         getSlaveGrids(): GridOptions[];
-        getGroupRowRenderer(): Object | Function;
+        getGroupRowRenderer(): Function | Object;
         getRowHeight(): number;
         getOverlayLoadingTemplate(): string;
         getOverlayNoRowsTemplate(): string;
@@ -1829,8 +1829,8 @@ declare module ag.grid {
         private expressionService;
         private columnController;
         init(gridOptionsWrapper: GridOptionsWrapper, expressionService: ExpressionService, columnController: ColumnController): void;
-        getValue(colDef: ColDef, data: any, node: any): any;
-        private executeValueGetter(valueGetter, data, colDef, node);
+        getValue(colDef: ColDef, data: any, node: any, renderingContext?: any): any;
+        private executeValueGetter(valueGetter, data, colDef, node, renderingContext?);
         private getValueCallback(data, node, field);
     }
 }

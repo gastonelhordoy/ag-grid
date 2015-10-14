@@ -1882,7 +1882,7 @@ var ag;
                             valueForCell = _this.createValueForGroupNode(node);
                         }
                         else {
-                            valueForCell = _this.valueService.getValue(column.colDef, node.data, node);
+                            valueForCell = _this.valueService.getValue(column.colDef, node.data, node, 'cvs');
                         }
                         if (valueForCell === null || valueForCell === undefined) {
                             valueForCell = '';
@@ -1920,7 +1920,7 @@ var ag;
                     stringValue = value.toString();
                 }
                 else {
-                    console.warn('known value type during csv conversio');
+                    console.warn('known value type during csv conversion');
                     stringValue = '';
                 }
                 return stringValue.replace(/"/g, "\"\"");
@@ -3560,8 +3560,7 @@ var ag;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var ag;
 (function (ag) {
@@ -9477,13 +9476,13 @@ var ag;
                 this.expressionService = expressionService;
                 this.columnController = columnController;
             };
-            ValueService.prototype.getValue = function (colDef, data, node) {
+            ValueService.prototype.getValue = function (colDef, data, node, renderingContext) {
                 var cellExpressions = this.gridOptionsWrapper.isEnableCellExpressions();
                 var field = colDef.field;
                 var result;
                 // if there is a value getter, this gets precedence over a field
                 if (colDef.valueGetter) {
-                    result = this.executeValueGetter(colDef.valueGetter, data, colDef, node);
+                    result = this.executeValueGetter(colDef.valueGetter, data, colDef, node, renderingContext);
                 }
                 else if (field && data) {
                     result = data[field];
@@ -9494,11 +9493,11 @@ var ag;
                 // the result could be an expression itself, if we are allowing cell values to be expressions
                 if (cellExpressions && (typeof result === 'string') && result.indexOf('=') === 0) {
                     var cellValueGetter = result.substring(1);
-                    result = this.executeValueGetter(cellValueGetter, data, colDef, node);
+                    result = this.executeValueGetter(cellValueGetter, data, colDef, node, renderingContext);
                 }
                 return result;
             };
-            ValueService.prototype.executeValueGetter = function (valueGetter, data, colDef, node) {
+            ValueService.prototype.executeValueGetter = function (valueGetter, data, colDef, node, renderingContext) {
                 var context = this.gridOptionsWrapper.getContext();
                 var api = this.gridOptionsWrapper.getApi();
                 var params = {
@@ -9507,7 +9506,8 @@ var ag;
                     colDef: colDef,
                     api: api,
                     context: context,
-                    getValue: this.getValueCallback.bind(this, data, node)
+                    getValue: this.getValueCallback.bind(this, data, node),
+                    renderingContext: renderingContext
                 };
                 if (typeof valueGetter === 'function') {
                     // valueGetter is a function, so just call it
